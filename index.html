@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colony Dashboard - The Ants</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Orbitron:wght@700&display=swap">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ===== テーマ ===== */
+:root {
+  --bg:       #1a1a1a;
+  --surface:  #262626;
+  --card1:    #2e2e2e;
+  --card2:    #272727;
+  --border:   #404040;
+  --accent:   #f59e0b;
+  --countdown:#34d399;
+  --countdown-utc:#fde047;
+  --text:     #f0f0f0;
+  --sub-text: #a0a0a0;
+  --dim-text: #686868;
+}
+[data-theme="light"] {
+  --bg:       #e8e8e8;
+  --surface:  #f5f5f5;
+  --card1:    #fafafa;
+  --card2:    #f0f0f0;
+  --border:   #c8c8c8;
+  --accent:   #d97706;
+  --countdown:#059669;
+  --countdown-utc:#ca8a04;
+  --text:     #1a1a1a;
+  --sub-text: #4a4a4a;
+  --dim-text: #888888;
+}
+[data-theme="gray"] {
+  --bg:       #ebebeb;
+  --surface:  #f8f8f8;
+  --card1:    #ffffff;
+  --card2:    #f5f5f5;
+  --border:   #d0d0d0;
+  --accent:   #78716c;
+  --countdown:#14b8a6;
+  --countdown-utc:#ca8a04;
+  --text:     #2a2a2a;
+  --sub-text: #5a5a5a;
+  --dim-text: #909090;
+}
+[data-theme="cream"] {
+  --bg:       #f5f1e8;
+  --surface:  #faf8f0;
+  --card1:    #fffef9;
+  --card2:    #f9f6ed;
+  --border:   #e0d8c8;
+  --accent:   #b8860b;
+  --countdown:#16a34a;
+  --countdown-utc:#ca8a04;
+  --text:     #3a2a1a;
+  --sub-text: #6a5a4a;
+  --dim-text: #a0907a;
+}
+[data-theme="blue"] {
+  --bg:       #0f1923;
+  --surface:  #162030;
+  --card1:    #1c2a3a;
+  --card2:    #182535;
+  --border:   #2a3f55;
+  --accent:   #38bdf8;
+  --countdown:#a78bfa;
+  --countdown-utc:#fde047;
+  --text:     #e8f4ff;
+  --sub-text: #6a90b0;
+  --dim-text: #3a5570;
+}
+[data-theme="green"] {
+  --bg:       #0d1a0f;
+  --surface:  #132015;
+  --card1:    #1a2c1c;
+  --card2:    #172718;
+  --border:   #2a4030;
+  --accent:   #4ade80;
+  --countdown:#fbbf24;
+  --countdown-utc:#fde047;
+  --text:     #e0f4e4;
+  --sub-text: #60906a;
+  --dim-text: #35573a;
+}
+[data-theme="purple"] {
+  --bg:       #130e1e;
+  --surface:  #1c1530;
+  --card1:    #251e3c;
+  --card2:    #201835;
+  --border:   #38285a;
+  --accent:   #c084fc;
+  --countdown:#fb923c;
+  --countdown-utc:#fde047;
+  --text:     #ede8ff;
+  --sub-text: #7860a8;
+  --dim-text: #4a3870;
+}
+[data-theme="red"] {
+  --bg:       #1a0e0e;
+  --surface:  #281414;
+  --card1:    #341c1c;
+  --card2:    #2c1818;
+  --border:   #502828;
+  --accent:   #f87171;
+  --countdown:#60d4b0;
+  --countdown-utc:#fde047;
+  --text:     #ffe8e8;
+  --sub-text: #a06060;
+  --dim-text: #704040;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* ===== タイトル ===== */
+.title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.4em;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* ===== 2カラムレイアウト ===== */
+.main-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== 左カラム ===== */
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ===== セクションラベル ===== */
+.section-label {
+  font-size: 12px;
+  color: var(--sub-text);
+  letter-spacing: 0.2em;
+  margin-bottom: 4px;
+  padding-left: 2px;
+  text-transform: uppercase;
+}
+
+/* ===== 時計バー ===== */
+.clock-bar {
+  background: var(--surface);
+  border: 2px solid var(--text);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.clock-time {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+}
+.clock-date {
+  font-size: 14px;
+  color: var(--text);
+  letter-spacing: 0.08em;
+  transition: color 0.3s;
+}
+
+/* UTC時のカウントダウン色変更 */
+body.utc-mode .clock-time,
+body.utc-mode .clock-date,
+body.utc-mode .event-countdown,
+body.utc-mode .event-dual-time,
+body.utc-mode .card-until {
+  color: var(--countdown-utc) !important;
+}
+
+/* ===== コントロールパネル ===== */
+.controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* タイムゾーン切り替えボタン */
+.tz-switch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--card1);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.tz-switch:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+.tz-switch.utc {
+  background: var(--countdown-utc);
+  color: #000;
+  border-color: var(--countdown-utc);
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* テーマ丸ボタン */
+.theme-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.theme-btn:hover  { transform: scale(1.15); }
+.theme-btn.active { border-color: var(--text); transform: scale(1.1); }
+.tb-dark   { background: radial-gradient(circle at 40% 40%, #888, #333); }
+.tb-light  { background: radial-gradient(circle at 40% 40%, #e8e8e8, #c8c8c8); border: 2px solid #aaa; }
+.tb-gray   { background: radial-gradient(circle at 40% 40%, #ebebeb, #d0d0d0); border: 2px solid #b0b0b0; }
+.tb-cream  { background: radial-gradient(circle at 40% 40%, #f5f1e8, #d8c8b0); border: 2px solid #c0b090; }
+.tb-blue   { background: radial-gradient(circle at 40% 40%, #7dd3fc, #0f1923); }
+.tb-green  { background: radial-gradient(circle at 40% 40%, #4ade80, #0d1a0f); }
+.tb-purple { background: radial-gradient(circle at 40% 40%, #c084fc, #130e1e); }
+.tb-red    { background: radial-gradient(circle at 40% 40%, #f87171, #1a0e0e); }
+
+/* ===== イベントタイマー（タイル化） ===== */
+.event-timer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.event-timer:first-of-type {
+  margin-top: 0;
+}
+
+.event-label {
+  font-size: 12px;
+  color: var(--sub-text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.event-countdown {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--countdown);
+  letter-spacing: 0.02em;
+  text-align: right;
+  transition: color 0.3s;
+}
+
+.event-dual {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.event-dual-time {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--countdown);
+  letter-spacing: 0.02em;
+  transition: color 0.3s;
+}
+
+.event-dual-sep {
+  font-size: 20px;
+  color: var(--dim-text);
+}
+
+/* ===== 右カラム ===== */
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ===== カード ===== */
+#card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hatch-card {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  gap: 12px;
+  background: var(--card2);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.rank-1 {
+  background: var(--card1);
+  border-color: var(--accent);
+  border-width: 2px;
+  padding: 18px;
+}
+.rank-2 {
+  background: var(--card1);
+  padding: 15px;
+}
+
+/* 左：カウントダウン */
+.card-countdown {
+  flex: 1;
+  min-width: 0;
+}
+.card-until-label {
+  font-size: 10px;
+  color: var(--sub-text);
+  letter-spacing: 0.15em;
+  margin-bottom: 2px;
+}
+.card-until {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  color: var(--countdown);
+  line-height: 1.1;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+.rank-1 .card-until { font-size: clamp(30px, 8vw, 42px); }
+.rank-2 .card-until { font-size: clamp(24px, 6vw, 32px); }
+.rank-3 .card-until,
+.rank-4 .card-until,
+.rank-5 .card-until { font-size: clamp(18px, 5vw, 24px); color: var(--sub-text); }
+
+/* 右：曜日・時間帯 */
+.card-info {
+  text-align: right;
+  flex-shrink: 0;
+}
+.card-day {
+  color: var(--sub-text);
+  letter-spacing: 0.1em;
+  margin-bottom: 3px;
+}
+.rank-1 .card-day { color: var(--accent); font-weight: 700; font-size: 12px; }
+.rank-2 .card-day { font-size: 11px; }
+.rank-3 .card-day,
+.rank-4 .card-day,
+.rank-5 .card-day { font-size: 11px; }
+
+.card-slot {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--text);
+}
+.rank-1 .card-slot { font-size: clamp(14px, 3.5vw, 17px); font-weight: 700; }
+.rank-2 .card-slot { font-size: clamp(13px, 3vw, 15px); font-weight: 700; }
+.rank-3 .card-slot,
+.rank-4 .card-slot,
+.rank-5 .card-slot { font-size: clamp(11px, 2.5vw, 13px); color: var(--sub-text); }
+
+/* NOWバッジ */
+.now-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #000;
+  background: var(--accent);
+  border-radius: 3px;
+  padding: 2px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="title">🐜 COLONY DASHBOARD</div>
+
+  <div class="main-layout">
+    <!-- 左カラム -->
+    <div class="left-col">
+      <!-- セクションラベル -->
+      <div class="section-label">Control Panel</div>
+      
+      <!-- 時計バー -->
+      <div class="clock-bar">
+        <div class="clock-date" id="date">----/--/-- (-)</div>
+        <div class="clock-time" id="clock">--:--:--</div>
+      </div>
+
+      <!-- コントロールパネル -->
+      <div class="controls">
+        <button class="tz-switch" id="tz-switch" title="切り替え: JST/UTC">JST</button>
+        <div class="btn-group" id="theme-btns">
+          <button class="theme-btn tb-dark   active" data-theme="dark"   title="Dark"></button>
+          <button class="theme-btn tb-light"          data-theme="light"  title="Light"></button>
+          <button class="theme-btn tb-gray"           data-theme="gray"   title="Gray"></button>
+          <button class="theme-btn tb-cream"          data-theme="cream"  title="Cream"></button>
+          <button class="theme-btn tb-blue"           data-theme="blue"   title="Blue"></button>
+          <button class="theme-btn tb-green"          data-theme="green"  title="Green"></button>
+          <button class="theme-btn tb-purple"         data-theme="purple" title="Purple"></button>
+          <button class="theme-btn tb-red"            data-theme="red"    title="Red"></button>
+        </div>
+      </div>
+
+      <!-- イベントタイマー（タイル化） -->
+      <div class="event-timer">
+        <div class="event-label">WARZONE ENTRY (月 09:30 / 13:00)</div>
+        <div class="event-dual">
+          <div class="event-dual-time" id="warzone1">--:--</div>
+          <div class="event-dual-sep">/</div>
+          <div class="event-dual-time" id="warzone2">--:--</div>
+        </div>
+      </div>
+
+      <div class="event-timer">
+        <div class="event-label">ANT HILL DEVELOPMENT (火 09:00)</div>
+        <div class="event-countdown" id="anthill">--:--</div>
+      </div>
+
+      <div class="event-timer">
+        <div class="event-label">NEXT EVOLUTION TIME (水 10:05)</div>
+        <div class="event-countdown" id="evolution">--:--</div>
+      </div>
+    </div>
+
+    <!-- 右カラム -->
+    <div class="right-col">
+      <div class="section-label">Hatch Point Schedule</div>
+      <div id="card-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SLOTS = [
+  { day:1, h:15, label:'月曜日', disp:'15:05-16:00' },
+  { day:1, h:16, label:'月曜日', disp:'16:05-17:00' },
+  { day:1, h:23, label:'月曜日', disp:'23:05-24:00' },
+  { day:2, h: 0, label:'火曜日', disp:' 0:05- 1:00' },
+  { day:2, h: 7, label:'火曜日', disp:' 7:05- 8:00' },
+  { day:2, h: 8, label:'火曜日', disp:' 8:05- 9:00' },
+  { day:2, h:12, label:'火曜日', disp:'12:05-13:00' },
+  { day:2, h:15, label:'火曜日', disp:'15:05-16:00' },
+  { day:2, h:20, label:'火曜日', disp:'20:05-21:00' },
+  { day:2, h:23, label:'火曜日', disp:'23:05-24:00' },
+  { day:3, h: 4, label:'水曜日', disp:' 4:05- 5:00' },
+  { day:3, h: 7, label:'水曜日', disp:' 7:05- 8:00' },
+  { day:3, h:13, label:'水曜日', disp:'13:05-14:00' },
+  { day:3, h:21, label:'水曜日', disp:'21:05-22:00' },
+  { day:4, h: 5, label:'木曜日', disp:' 5:05- 6:00' },
+  { day:5, h:14, label:'金曜日', disp:'14:05-15:00' },
+  { day:5, h:15, label:'金曜日', disp:'15:05-16:00' },
+  { day:5, h:22, label:'金曜日', disp:'22:05-23:00' },
+  { day:5, h:23, label:'金曜日', disp:'23:05-24:00' },
+  { day:6, h: 6, label:'土曜日', disp:' 6:05- 7:00' },
+  { day:6, h: 7, label:'土曜日', disp:' 7:05- 8:00' },
+  { day:6, h:15, label:'土曜日', disp:'15:05-16:00' },
+  { day:6, h:16, label:'土曜日', disp:'16:05-17:00' },
+  { day:6, h:23, label:'土曜日', disp:'23:05-24:00' },
+  { day:0, h: 0, label:'日曜日', disp:' 0:05- 1:00' },
+  { day:0, h: 7, label:'日曜日', disp:' 7:05- 8:00' },
+  { day:0, h: 8, label:'日曜日', disp:' 8:05- 9:00' },
+];
+
+const DAYS_JP = ['日','月','火','水','木','金','土'];
+let isUTC = false;
+
+// 孵化タイマー計算（ローカルタイムで計算）
+function secondsUntil(now, slot) {
+  const nowMs = now.getTime();
+  const midnight = new Date(now);
+  midnight.setHours(0,0,0,0);
+  const mondayMs = midnight.getTime() - ((now.getDay()+6)%7)*86400000;
+  const offset = (slot.day+6)%7;
+  let startMs = mondayMs + offset*86400000 + slot.h*3600000 + 5*60000;
+  const endMs = startMs + 55*60000;
+  
+  if (nowMs >= startMs && nowMs < endMs) return 0;
+  if (startMs <= nowMs) startMs += 7*86400000;
+  return Math.floor((startMs - nowMs)/1000);
+}
+
+// イベントタイマー計算（ローカルタイムで計算）
+function secondsUntilEvent(now, targetDay, targetHour, targetMinute) {
+  const nowMs = now.getTime();
+  const midnight = new Date(now);
+  midnight.setHours(0,0,0,0);
+  const currentDay = now.getDay();
+  
+  let daysUntil = (targetDay - currentDay + 7) % 7;
+  if (daysUntil === 0) {
+    const todayTarget = new Date(midnight);
+    todayTarget.setHours(targetHour, targetMinute, 0, 0);
+    if (nowMs >= todayTarget.getTime()) {
+      daysUntil = 7;
+    }
+  }
+  
+  const targetMs = midnight.getTime() + daysUntil * 86400000 + targetHour * 3600000 + targetMinute * 60000;
+  return Math.floor((targetMs - nowMs) / 1000);
+}
+
+function formatCountdown(secs) {
+  if (secs === 0) return 'NOW';
+  const d = Math.floor(secs/86400);
+  const h = Math.floor((secs%86400)/3600);
+  const m = Math.floor((secs%3600)/60);
+  let s = '';
+  if (d > 0) s += d + '日 ';
+  s += String(h).padStart(2,'0') + '時間 ';
+  s += String(m).padStart(2,'0') + '分';
+  return s;
+}
+
+function formatEventCountdown(secs) {
+  if (secs <= 0) return '--:--';
+  const d = Math.floor(secs/86400);
+  const h = Math.floor((secs%86400)/3600);
+  const m = Math.floor((secs%3600)/60);
+  if (d > 0) return `${d}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+function buildCards() {
+  const list = document.getElementById('card-list');
+  list.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const rank = i + 1;
+    const card = document.createElement('div');
+    card.className = `hatch-card rank-${rank}`;
+    card.id = `card-${rank}`;
+    card.innerHTML = `
+      <div class="card-countdown">
+        <div class="card-until-label" id="c-label-${rank}"></div>
+        <div class="card-until" id="c-until-${rank}"></div>
+      </div>
+      <div class="card-info">
+        <div class="card-day" id="c-day-${rank}"></div>
+        <div class="card-slot" id="c-slot-${rank}"></div>
+      </div>`;
+    list.appendChild(card);
+  }
+}
+
+function updateCards(sorted) {
+  for (let i = 0; i < 5; i++) {
+    const item = sorted[i];
+    const rank = i + 1;
+    const active = item.secs === 0;
+    const dayEl   = document.getElementById(`c-day-${rank}`);
+    const slotEl  = document.getElementById(`c-slot-${rank}`);
+    const labelEl = document.getElementById(`c-label-${rank}`);
+    const untilEl = document.getElementById(`c-until-${rank}`);
+    if (!dayEl) continue;
+    dayEl.innerHTML = item.label + (active ? ' <span class="now-badge">NOW</span>' : '');
+    slotEl.textContent  = item.disp;
+    labelEl.textContent = active ? '' : 'あと';
+    untilEl.textContent = formatCountdown(item.secs);
+  }
+}
+
+function updateEventTimers(now) {
+  const wz1 = secondsUntilEvent(now, 1, 9, 30);
+  const wz2 = secondsUntilEvent(now, 1, 13, 0);
+  document.getElementById('warzone1').textContent = formatEventCountdown(wz1);
+  document.getElementById('warzone2').textContent = formatEventCountdown(wz2);
+  
+  const ah = secondsUntilEvent(now, 2, 9, 0);
+  document.getElementById('anthill').textContent = formatEventCountdown(ah);
+  
+  const evo = secondsUntilEvent(now, 3, 10, 5);
+  document.getElementById('evolution').textContent = formatEventCountdown(evo);
+}
+
+function tick() {
+  const now = new Date();
+  
+  // 表示用の時刻（JST or UTC）
+  let displayTime;
+  if (isUTC) {
+    displayTime = new Date(now.getTime() - 9*3600000); // JSTからUTCに変換
+    const hh = String(displayTime.getUTCHours()).padStart(2,'0');
+    const mm = String(displayTime.getUTCMinutes()).padStart(2,'0');
+    const ss = String(displayTime.getUTCSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
+    
+    const year = displayTime.getUTCFullYear();
+    const month = String(displayTime.getUTCMonth()+1).padStart(2,'0');
+    const date = String(displayTime.getUTCDate()).padStart(2,'0');
+    const day = DAYS_JP[displayTime.getUTCDay()];
+    document.getElementById('date').textContent = `${year}/${month}/${date} (${day})`;
+  } else {
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    const ss = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
+    
+    const year = now.getFullYear();
+    const month = String(now.getMonth()+1).padStart(2,'0');
+    const date = String(now.getDate()).padStart(2,'0');
+    const day = DAYS_JP[now.getDay()];
+    document.getElementById('date').textContent = `${year}/${month}/${date} (${day})`;
+  }
+  
+  // カウントダウン計算はローカルタイム（JST）のまま
+  const sorted = SLOTS.map(s => ({...s, secs: secondsUntil(now, s)}))
+                       .sort((a,b) => a.secs - b.secs);
+  updateCards(sorted);
+  updateEventTimers(now);
+}
+
+// タイムゾーン切り替え
+document.getElementById('tz-switch').addEventListener('click', () => {
+  isUTC = !isUTC;
+  const btn = document.getElementById('tz-switch');
+  btn.textContent = isUTC ? 'UTC' : 'JST';
+  btn.classList.toggle('utc', isUTC);
+  document.body.classList.toggle('utc-mode', isUTC);
+  tick();
+});
+
+// テーマ
+document.getElementById('theme-btns').addEventListener('click', e => {
+  const btn = e.target.closest('.theme-btn');
+  if (!btn) return;
+  const t = btn.dataset.theme;
+  document.body.dataset.theme = (t === 'dark') ? '' : t;
+  if (t === 'dark') delete document.body.dataset.theme;
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+});
+
+buildCards();
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
