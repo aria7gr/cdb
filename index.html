@@ -18,6 +18,7 @@ v2.0  2026.02.23  2カラムレイアウト化・イベントタイマー3種追
 v2.0.1 2026.02.24 タイムゾーンバグ修正・Light/Gray/Creamテーマ配色調整
 v2.1  2026.03.05  英語調カウントダウン(Next)・🐕[HACHI]命名・Roboto Mono採用・バージョン表示追加
 v2.1.1 2026.03.05 Warzone 2行レイアウト・フォント24px・コンパネ幅拡大(420px)
+v2.1.2 2026.03.05 タイトル変更(-HACHI-)・コンパネ間隔調整・バージョン透明度0.3
 */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -156,6 +157,10 @@ body {
   margin-bottom: 16px;
 }
 
+.title-hachi {
+  color: #d0d0d0;
+}
+
 /* ===== バージョン表示 ===== */
 .version {
   position: fixed;
@@ -165,7 +170,7 @@ body {
   font-size: 10px;
   color: var(--dim-text);
   letter-spacing: 0.05em;
-  opacity: 0.6;
+  opacity: 0.3;
   user-select: none;
   pointer-events: none;
 }
@@ -188,7 +193,7 @@ body {
 .left-col {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* ===== セクションラベル ===== */
@@ -311,7 +316,7 @@ body.utc-mode .card-until {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 12px;
+  margin-top: 6px;
 }
 
 .event-timer:first-of-type {
@@ -368,7 +373,7 @@ body.utc-mode .card-until {
 .right-col {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* ===== カード ===== */
@@ -476,7 +481,7 @@ body.utc-mode .card-until {
 <body>
 <div class="wrapper">
 
-  <div class="title">COLONY DASHBOARD [HACHI]</div>
+  <div class="title">COLONY DASHBOARD <span class="title-hachi">-HACHI-</span></div>
 
   <div class="main-layout">
     <!-- 左カラム -->
@@ -535,7 +540,7 @@ body.utc-mode .card-until {
 </div>
 
 <!-- バージョン表示 -->
-<div class="version">Mar 05 '26 🐕 v2.1.1</div>
+<div class="version">Mar 05 '26 🐕 v2.1.2</div>
 
 <script>
 const SLOTS = [
